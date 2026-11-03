@@ -7,7 +7,7 @@
  * they only make sure it's queued in time.
  */
 import { BEATS_PER_BAR, Timeline } from "./timeline";
-import { renderHiHat } from "./hihat";
+import { ClickSoundId, renderClickSound } from "./sounds";
 import { renderChime } from "./chime";
 import { isClearBeat } from "../visual/wallModel";
 
@@ -27,13 +27,17 @@ export interface EngineOptions {
   perWall: number;
   /** Ring a triangle when a wall clears. */
   chime: boolean;
+  /** Which click sound to use. */
+  clickSound: ClickSoundId;
 }
 
 export class Engine {
   readonly timeline = new Timeline();
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
-  private hihat: AudioBuffer | null = null;
+  /** The current click sound, and a cache of the ones already rendered. */
+  private click: AudioBuffer | null = null;
+  private clickCache = new Map<ClickSoundId, AudioBuffer>();
   private chime: AudioBuffer | null = null;
   private worker: Worker | null = null;
   private nextBeat = 0;
@@ -59,20 +63,13 @@ export class Engine {
   /** Start playing; the first click sounds `lead` seconds from now. */
   async start(lead = 0.15): Promise<void> {
     if (this.playing) return;
-    if (!this.ctx) {
-      this.ctx = new AudioContext({ latencyHint: "interactive" });
-      this.master = this.ctx.createGain();
-      this.master.connect(this.ctx.destination);
-      [this.hihat, this.chime] = await Promise.all([
-        renderHiHat(this.ctx.sampleRate),
-        renderChime(this.ctx.sampleRate),
-      ]);
-    }
-    await this.ctx.resume();
-    const now = this.ctx.currentTime;
+    const ctx = await this.ensureContext();
+    this.click = await this.clickBuffer(this.opts.clickSound);
+    await ctx.resume();
+    const now = ctx.currentTime;
     this.master!.gain.cancelScheduledValues(now);
     this.master!.gain.setValueAtTime(this.opts.volume, now);
-    this.timeline.start(this.ctx.currentTime + lead, this.opts.bpm);
+    this.timeline.start(ctx.currentTime + lead, this.opts.bpm);
     this.leadBeats = (lead * this.opts.bpm) / 60;
     this.nextBeat = 0;
     this.playing = true;
@@ -105,6 +102,42 @@ export class Engine {
 
   setCountInBars(bars: number): void {
     this.opts.countInBars = bars;
+  }
+
+  setClickSound(id: ClickSoundId): void {
+    this.opts.clickSound = id;
+  }
+
+  /** Play one click of a sound right now (for choosing a sound in Settings). */
+  async preview(id: ClickSoundId): Promise<void> {
+    const ctx = await this.ensureContext();
+    await ctx.resume();
+    const buf = await this.clickBuffer(id);
+    if (!this.playing) {
+      const now = ctx.currentTime;
+      this.master!.gain.cancelScheduledValues(now);
+      this.master!.gain.setValueAtTime(this.opts.volume, now);
+    }
+    this.play(buf, ctx.currentTime + 0.01);
+  }
+
+  private async ensureContext(): Promise<AudioContext> {
+    if (!this.ctx) {
+      this.ctx = new AudioContext({ latencyHint: "interactive" });
+      this.master = this.ctx.createGain();
+      this.master.connect(this.ctx.destination);
+      this.chime = await renderChime(this.ctx.sampleRate);
+    }
+    return this.ctx;
+  }
+
+  private async clickBuffer(id: ClickSoundId): Promise<AudioBuffer> {
+    let buf = this.clickCache.get(id);
+    if (!buf) {
+      buf = await renderClickSound(id, this.ctx!.sampleRate);
+      this.clickCache.set(id, buf);
+    }
+    return buf;
   }
 
   /** Wall size and chime on/off (set when Play is pressed). */
@@ -142,7 +175,7 @@ export class Engine {
 
   private tick(): void {
     const ctx = this.ctx;
-    if (!this.playing || !ctx || !this.hihat || !this.master) return;
+    if (!this.playing || !ctx || !this.click || !this.master) return;
     const horizon = ctx.currentTime + LOOKAHEAD;
     for (;;) {
       const t = this.timeline.timeOfBeat(this.nextBeat);
@@ -153,7 +186,7 @@ export class Engine {
       const clicks = inCountIn || this.opts.clickBeats.includes(beatInBar);
       const fresh = t >= ctx.currentTime - 0.005;
       if (fresh && clicks) {
-        this.play(this.hihat, t);
+        this.play(this.click, t);
         this.scheduleLog?.push(t);
       }
       // Triangle "ding" on the 1 where a finished wall starts to clear.

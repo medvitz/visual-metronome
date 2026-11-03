@@ -15,7 +15,7 @@
       <header class="top">
         <div class="brand">
           <span class="brand-name">Visual Metronome</span>
-          <button id="versionChip" class="chip" aria-label="What's new">v0.10</button>
+          <button id="versionChip" class="chip" aria-label="What's new">v0.11</button>
         </div>
         <button id="settingsBtn" class="icon-btn" aria-label="Settings">
           <svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.4 7.4 0 0 0-1.7-1L15 3.3h-4l-.4 2.6a7.4 7.4 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.4 7.4 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7.4 7.4 0 0 0 1.7-1l2.5 1 2-3.5zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" transform="translate(-1 0)"/></svg>
@@ -64,6 +64,18 @@
             <label><input type="checkbox" value="4" /><span>4</span></label>
           </div>
           <p class="hint">Default is all four beats. For the jazz hi-hat feel, turn off 1 and 3.</p>
+        </section>
+
+        <section>
+          <h3>Click sound</h3>
+          <div class="segmented sound-grid" id="clickSound">
+            <label><input type="radio" name="clickSound" value="hihat" /><span>Hi-hat</span></label>
+            <label><input type="radio" name="clickSound" value="click" /><span>Classic click</span></label>
+            <label><input type="radio" name="clickSound" value="woodblock" /><span>Woodblock</span></label>
+            <label><input type="radio" name="clickSound" value="cowbell" /><span>Cowbell</span></label>
+            <label><input type="radio" name="clickSound" value="blip" /><span>Electro blip</span></label>
+          </div>
+          <p class="hint">Tap a sound to hear it.</p>
         </section>
 
         <section>

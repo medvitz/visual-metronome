@@ -1,7 +1,7 @@
 import { registerSW } from "virtual:pwa-register";
 import { Engine } from "./audio/engine";
 import { renderChime } from "./audio/chime";
-import { renderHiHat } from "./audio/hihat";
+import { renderClickSound } from "./audio/sounds";
 import { beatInfo } from "./audio/timeline";
 import { loadSettings } from "./settings";
 import { Controls } from "./ui/controls";
@@ -19,6 +19,7 @@ const engine = new Engine({
   countInBars: settings.countInBars,
   perWall: settings.perWall,
   chime: settings.chime,
+  clickSound: settings.clickSound,
 });
 
 const wallCanvas = document.getElementById("wall") as HTMLCanvasElement;
@@ -142,6 +143,7 @@ const controls = new Controls(settings, {
       countInBars = settings.countInBars;
       engine.setCountInBars(countInBars);
       engine.setWall(perWall, settings.chime);
+      engine.setClickSound(settings.clickSound);
       buildDots(countInBars * 4);
       await engine.start(countInBars === 0 ? NO_COUNT_IN_LEAD : 0.15);
       controls.setPlaying(true);
@@ -151,6 +153,9 @@ const controls = new Controls(settings, {
   onBpm: (bpm) => engine.setBpm(bpm),
   onClickBeats: (beats) => engine.setClickBeats(beats),
   onVolume: (v) => engine.setVolume(v),
+  onPreviewSound: (id) => {
+    engine.preview(id);
+  },
   // Any change in Settings stops the metronome and clears the wall.
   onSettingsChanged() {
     if (engine.isPlaying) {
@@ -165,10 +170,10 @@ const controls = new Controls(settings, {
 });
 
 // Handy for timing checks from the browser console / tests.
-const debug: { engine: Engine; settings: typeof settings; wall?: unknown; renderChime: unknown; renderHiHat: unknown } = {
+const debug: { engine: Engine; settings: typeof settings; wall?: unknown; renderChime: unknown; renderClickSound: unknown } = {
   engine,
   settings,
   renderChime,
-  renderHiHat,
+  renderClickSound,
 };
 (window as unknown as { __jdm: unknown }).__jdm = debug;

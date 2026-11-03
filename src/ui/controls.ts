@@ -1,5 +1,6 @@
 import { BPM_MAX, BPM_MIN, Settings, saveSettings } from "../settings";
 import { VERSION, WHATS_NEW } from "../version";
+import { ClickSoundId, isClickSound } from "../audio/sounds";
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
@@ -8,6 +9,8 @@ export interface ControlCallbacks {
   onBpm: (bpm: number) => void;
   onClickBeats: (beats: number[]) => void;
   onVolume: (v: number) => void;
+  /** Play one click of a sound so you can hear it. */
+  onPreviewSound: (id: ClickSoundId) => void;
   /** Called after any change in the Settings panel. */
   onSettingsChanged: () => void;
 }
@@ -122,6 +125,22 @@ export class Controls {
         if (i.checked) this.s.countInBars = Number(i.value) as 0 | 1 | 2;
         saveSettings(this.s);
         this.cb.onSettingsChanged();
+      });
+    }
+
+    for (const i of document.querySelectorAll<HTMLInputElement>('#clickSound input[type="radio"]')) {
+      i.checked = i.value === this.s.clickSound;
+      i.addEventListener("change", () => {
+        if (!i.checked || !isClickSound(i.value)) return;
+        this.s.clickSound = i.value;
+        saveSettings(this.s);
+        this.cb.onSettingsChanged();
+        this.cb.onPreviewSound(i.value);
+      });
+      // Tapping the already-selected sound plays it again.
+      // (Skip the radio's own bubbled click so a new choice doesn't play twice.)
+      i.parentElement!.addEventListener("click", (e) => {
+        if (e.target !== i && i.checked && isClickSound(i.value)) this.cb.onPreviewSound(i.value);
       });
     }
 

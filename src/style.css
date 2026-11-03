@@ -276,3 +276,9 @@ button.primary {
 .switch-row input:checked + .switch { background: var(--accent); }
 .switch-row input:checked + .switch::after { transform: translateX(20px); }
 .switch-row input:focus-visible + .switch { outline: 2px solid var(--text); outline-offset: 2px; }
+
+/* Click sound choices: wrap onto two rows */
+.sound-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
+.sound-grid span { font-size: 14px; padding: 12px 4px; }
+.sound-grid label { display: flex; }
+.sound-grid span { flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1.15; }

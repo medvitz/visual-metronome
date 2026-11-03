@@ -1,6 +1,9 @@
+import { ClickSoundId, DEFAULT_CLICK_SOUND, isClickSound } from "./audio/sounds";
+
 export interface Settings {
   bpm: number;
   clickBeats: number[]; // 1-based beats that click
+  clickSound: ClickSoundId;
   /** Bars (= bricks) per wall: one chorus. */
   perWall: number;
   /** Bars of count-in (clicks on all four beats). The last count-in bar is wall bar 1. */
@@ -15,6 +18,7 @@ export interface Settings {
 export const DEFAULTS: Settings = {
   bpm: 120,
   clickBeats: [1, 2, 3, 4],
+  clickSound: DEFAULT_CLICK_SOUND,
   perWall: 16,
   countInBars: 1,
   chime: true,
@@ -54,6 +58,7 @@ export function loadSettings(): Settings {
     }
     if (![0, 1, 2].includes(s.countInBars)) s.countInBars = 1;
     s.chime = s.chime !== false;
+    if (!isClickSound(s.clickSound)) s.clickSound = DEFAULT_CLICK_SOUND;
     if (!Array.isArray(s.clickBeats)) s.clickBeats = [...DEFAULTS.clickBeats];
     return s;
   } catch {
