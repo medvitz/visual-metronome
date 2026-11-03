@@ -44,6 +44,20 @@ describe("wallState", () => {
   });
 });
 
+describe("wall sizes", () => {
+  for (const size of [8, 12, 16, 24, 32]) {
+    it(`${size}-bar wall fills, clears and restarts at 1`, () => {
+      const end = size * 4; // the 1 after the last brick lands
+      expect(wallState(end - 0.5, size).bricks).toHaveLength(size); // last brick falling
+      const full = wallState(end + 0.5, size);
+      expect(full.bricks).toHaveLength(size);
+      expect(full.clearing).not.toBeNull();
+      expect(wallState(end + 3.5, size).bricks[0]).toMatchObject({ number: 1, slot: 0 });
+      expect(wallState(end + 3.5, size).wallIndex).toBe(1);
+    });
+  }
+});
+
 describe("count-in", () => {
   it("1 bar: the count-in clicks count toward brick 1", () => {
     // Brick 1 falls on the count-in's beat 4 and lands on the first 1 after it.

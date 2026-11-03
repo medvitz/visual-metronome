@@ -1,7 +1,8 @@
 export interface Settings {
   bpm: number;
   clickBeats: number[]; // 1-based beats that click
-  perWall: 16 | 32;
+  /** Bars (= bricks) per wall: one chorus. */
+  perWall: number;
   /** Bars of count-in (clicks on all four beats). The last count-in bar is wall bar 1. */
   countInBars: 0 | 1 | 2;
   volume: number; // 0..1
@@ -17,6 +18,9 @@ export const DEFAULTS: Settings = {
   volume: 0.8,
   visualOffsetMs: 0,
 };
+
+/** Wall sizes offered in Settings (multiples of 4: one row of bricks is 4 bars). */
+export const WALL_SIZES = [8, 12, 16, 24, 32];
 
 export const BPM_MIN = 40;
 export const BPM_MAX = 320;
@@ -38,7 +42,7 @@ export function loadSettings(): Settings {
     }
     const s = { ...DEFAULTS, ...JSON.parse(raw) } as Settings;
     s.bpm = Math.min(BPM_MAX, Math.max(BPM_MIN, Math.round(s.bpm)));
-    if (s.perWall !== 16 && s.perWall !== 32) s.perWall = 16;
+    if (!WALL_SIZES.includes(s.perWall)) s.perWall = DEFAULTS.perWall;
     // v0.4 stored an on/off switch; carry it over.
     const legacy = (s as unknown as { countIn?: boolean }).countIn;
     if (legacy !== undefined) {

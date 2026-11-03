@@ -15,7 +15,7 @@
       <header class="top">
         <div class="brand">
           <span class="brand-name">Jazz Drummer Metronome</span>
-          <button id="versionChip" class="chip" aria-label="What's new">v0.7</button>
+          <button id="versionChip" class="chip" aria-label="What's new">v0.8</button>
         </div>
         <button id="settingsBtn" class="icon-btn" aria-label="Settings">
           <svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.4 7.4 0 0 0-1.7-1L15 3.3h-4l-.4 2.6a7.4 7.4 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.4 7.4 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7.4 7.4 0 0 0 1.7-1l2.5 1 2-3.5zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" transform="translate(-1 0)"/></svg>
@@ -77,12 +77,15 @@
         </section>
 
         <section>
-          <h3>Bricks per wall</h3>
+          <h3>Bars per wall</h3>
           <div class="segmented" id="perWall">
-            <label><input type="radio" name="perWall" value="16" /><span>16 bars</span></label>
-            <label><input type="radio" name="perWall" value="32" /><span>32 bars</span></label>
+            <label><input type="radio" name="perWall" value="8" /><span>8</span></label>
+            <label><input type="radio" name="perWall" value="12" /><span>12</span></label>
+            <label><input type="radio" name="perWall" value="16" /><span>16</span></label>
+            <label><input type="radio" name="perWall" value="24" /><span>24</span></label>
+            <label><input type="radio" name="perWall" value="32" /><span>32</span></label>
           </div>
-          <p class="hint">Each wall is one chorus: 16 or 32 bars.</p>
+          <p class="hint">Each wall is one chorus, one brick per bar. 12 for a blues, 32 for an AABA standard.</p>
         </section>
 
         <section>

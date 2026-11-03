@@ -110,7 +110,7 @@ export class Controls {
     for (const i of this.perWallInputs) {
       i.checked = Number(i.value) === this.s.perWall;
       i.addEventListener("change", () => {
-        if (i.checked) this.s.perWall = Number(i.value) as 16 | 32;
+        if (i.checked) this.s.perWall = Number(i.value);
         saveSettings(this.s);
         this.cb.onSettingsChanged();
       });
