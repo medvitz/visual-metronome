@@ -5,6 +5,8 @@ export interface Settings {
   perWall: number;
   /** Bars of count-in (clicks on all four beats). The last count-in bar is wall bar 1. */
   countInBars: 0 | 1 | 2;
+  /** Triangle "ding" when a wall clears. */
+  chime: boolean;
   volume: number; // 0..1
   /** Shift the visuals vs. the sound, in ms (positive = visuals later). For Bluetooth etc. */
   visualOffsetMs: number;
@@ -15,6 +17,7 @@ export const DEFAULTS: Settings = {
   clickBeats: [1, 2, 3, 4],
   perWall: 16,
   countInBars: 1,
+  chime: true,
   volume: 0.8,
   visualOffsetMs: 0,
 };
@@ -50,6 +53,7 @@ export function loadSettings(): Settings {
       delete (s as unknown as { countIn?: boolean }).countIn;
     }
     if (![0, 1, 2].includes(s.countInBars)) s.countInBars = 1;
+    s.chime = s.chime !== false;
     if (!Array.isArray(s.clickBeats)) s.clickBeats = [...DEFAULTS.clickBeats];
     return s;
   } catch {

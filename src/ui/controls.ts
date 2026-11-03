@@ -125,6 +125,14 @@ export class Controls {
       });
     }
 
+    const chime = $<HTMLInputElement>("chimeToggle");
+    chime.checked = this.s.chime;
+    chime.addEventListener("change", () => {
+      this.s.chime = chime.checked;
+      saveSettings(this.s);
+      this.cb.onSettingsChanged();
+    });
+
     const vol = $<HTMLInputElement>("volume");
     vol.value = String(this.s.volume);
     vol.addEventListener("input", () => {

@@ -15,7 +15,7 @@
       <header class="top">
         <div class="brand">
           <span class="brand-name">Visual Metronome</span>
-          <button id="versionChip" class="chip" aria-label="What's new">v0.9</button>
+          <button id="versionChip" class="chip" aria-label="What's new">v0.10</button>
         </div>
         <button id="settingsBtn" class="icon-btn" aria-label="Settings">
           <svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.4 7.4 0 0 0-1.7-1L15 3.3h-4l-.4 2.6a7.4 7.4 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.4 7.4 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7.4 7.4 0 0 0 1.7-1l2.5 1 2-3.5zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" transform="translate(-1 0)"/></svg>
@@ -86,6 +86,16 @@
             <label><input type="radio" name="perWall" value="32" /><span>32</span></label>
           </div>
           <p class="hint">Each wall is one chorus, one brick per bar. 12 for a blues, 32 for an AABA standard.</p>
+        </section>
+
+        <section>
+          <h3>Wall-clear chime</h3>
+          <label class="switch-row">
+            <input type="checkbox" id="chimeToggle" />
+            <span class="switch" aria-hidden="true"></span>
+            <span>Ring a triangle when the wall clears</span>
+          </label>
+          <p class="hint">It rings on the 1 where the last brick lands, marking the end of each chorus.</p>
         </section>
 
         <section>

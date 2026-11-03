@@ -8,6 +8,8 @@
  */
 import { BEATS_PER_BAR, Timeline } from "./timeline";
 import { renderHiHat } from "./hihat";
+import { renderChime } from "./chime";
+import { isClearBeat } from "../visual/wallModel";
 
 const LOOKAHEAD = 0.12; // seconds of audio queued ahead
 const TICK_MS = 25;
@@ -21,6 +23,10 @@ export interface EngineOptions {
   volume: number; // 0..1
   /** Bars of count-in at the start (click on every beat). */
   countInBars: number;
+  /** Bars per wall (needed to know when a wall clears). */
+  perWall: number;
+  /** Ring a triangle when a wall clears. */
+  chime: boolean;
 }
 
 export class Engine {
@@ -28,11 +34,14 @@ export class Engine {
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
   private hihat: AudioBuffer | null = null;
+  private chime: AudioBuffer | null = null;
   private worker: Worker | null = null;
   private nextBeat = 0;
   private playing = false;
   /** Optional: log of scheduled click times (for timing checks). */
   scheduleLog: number[] | null = null;
+  /** Optional: log of scheduled chime times (for checks). */
+  chimeLog: number[] | null = null;
 
   constructor(private opts: EngineOptions) {}
 
@@ -54,7 +63,10 @@ export class Engine {
       this.ctx = new AudioContext({ latencyHint: "interactive" });
       this.master = this.ctx.createGain();
       this.master.connect(this.ctx.destination);
-      this.hihat = await renderHiHat(this.ctx.sampleRate);
+      [this.hihat, this.chime] = await Promise.all([
+        renderHiHat(this.ctx.sampleRate),
+        renderChime(this.ctx.sampleRate),
+      ]);
     }
     await this.ctx.resume();
     const now = this.ctx.currentTime;
@@ -95,6 +107,12 @@ export class Engine {
     this.opts.countInBars = bars;
   }
 
+  /** Wall size and chime on/off (set when Play is pressed). */
+  setWall(perWall: number, chime: boolean): void {
+    this.opts.perWall = perWall;
+    this.opts.chime = chime;
+  }
+
   setClickBeats(beats: number[]): void {
     this.opts.clickBeats = beats;
   }
@@ -133,14 +151,26 @@ export class Engine {
       // Skip a beat that's already in the past (e.g. tab was suspended).
       const inCountIn = this.nextBeat < this.opts.countInBars * BEATS_PER_BAR;
       const clicks = inCountIn || this.opts.clickBeats.includes(beatInBar);
-      if (t >= ctx.currentTime - 0.005 && clicks) {
-        const src = ctx.createBufferSource();
-        src.buffer = this.hihat;
-        src.connect(this.master);
-        src.start(Math.max(t, ctx.currentTime));
+      const fresh = t >= ctx.currentTime - 0.005;
+      if (fresh && clicks) {
+        this.play(this.hihat, t);
         this.scheduleLog?.push(t);
+      }
+      // Triangle "ding" on the 1 where a finished wall starts to clear.
+      const { chime, perWall, countInBars } = this.opts;
+      if (fresh && chime && this.chime && isClearBeat(this.nextBeat, perWall, countInBars)) {
+        this.play(this.chime, t);
+        this.chimeLog?.push(t);
       }
       this.nextBeat++;
     }
+  }
+
+  private play(buf: AudioBuffer, t: number): void {
+    const ctx = this.ctx!;
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.connect(this.master!);
+    src.start(Math.max(t, ctx.currentTime));
   }
 }

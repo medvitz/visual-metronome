@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { wallBar, wallBeat, wallState } from "../src/visual/wallModel";
+import { isClearBeat, wallBar, wallBeat, wallState } from "../src/visual/wallModel";
 
 describe("wallState", () => {
   it("is empty during the first three beats", () => {
@@ -91,6 +91,26 @@ describe("count-in", () => {
         const bricks = wallState(wallBeat(beat, n), 16).bricks;
         expect(wallBar(beat, n)).toBe(bar);
         expect(bricks[bricks.length - 1].number).toBe(bar + 1);
+      }
+    }
+  });
+});
+
+describe("wall-clear chime timing", () => {
+  it("rings on the 1 where the last brick lands, in every count-in mode", () => {
+    for (const n of [0, 1, 2]) {
+      for (const size of [8, 12, 16, 24, 32]) {
+        const rings: number[] = [];
+        for (let beat = 0; beat < 4 * (n + 2 * size + 2); beat++) {
+          if (isClearBeat(beat, size, n)) rings.push(beat);
+        }
+        expect(rings).toHaveLength(2); // two walls finished in this span
+        for (const beat of rings) {
+          // At that beat the wall is full and starting to clear.
+          const s = wallState(wallBeat(beat, n), size);
+          expect(s.clearing).toBe(0);
+          expect(s.bricks).toHaveLength(size);
+        }
       }
     }
   });

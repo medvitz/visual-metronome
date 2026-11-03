@@ -29,6 +29,15 @@ export function wallBeat(beat: number, countInBars: number): number {
   return beat - (countInBars - 1) * BEATS_PER_BAR;
 }
 
+/**
+ * True if (integer) beat `beat` is the moment a finished wall starts to clear:
+ * the 1 where the wall's last brick lands. The engine rings the chime here.
+ */
+export function isClearBeat(beat: number, perWall: number, countInBars: number): boolean {
+  const wb = wallBeat(beat, countInBars);
+  return wb > 0 && wb % (perWall * BEATS_PER_BAR) === 0;
+}
+
 /** 0-based bar of the wall run (bar 0 = the bar brick 1 lands on). Negative during count-in. */
 export function wallBar(beat: number, countInBars: number): number {
   return Math.floor((beat - countInBars * BEATS_PER_BAR) / BEATS_PER_BAR);

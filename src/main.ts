@@ -1,5 +1,7 @@
 import { registerSW } from "virtual:pwa-register";
 import { Engine } from "./audio/engine";
+import { renderChime } from "./audio/chime";
+import { renderHiHat } from "./audio/hihat";
 import { beatInfo } from "./audio/timeline";
 import { loadSettings } from "./settings";
 import { Controls } from "./ui/controls";
@@ -15,6 +17,8 @@ const engine = new Engine({
   clickBeats: settings.clickBeats,
   volume: settings.volume,
   countInBars: settings.countInBars,
+  perWall: settings.perWall,
+  chime: settings.chime,
 });
 
 const wallCanvas = document.getElementById("wall") as HTMLCanvasElement;
@@ -137,6 +141,7 @@ const controls = new Controls(settings, {
       perWall = settings.perWall;
       countInBars = settings.countInBars;
       engine.setCountInBars(countInBars);
+      engine.setWall(perWall, settings.chime);
       buildDots(countInBars * 4);
       await engine.start(countInBars === 0 ? NO_COUNT_IN_LEAD : 0.15);
       controls.setPlaying(true);
@@ -160,5 +165,10 @@ const controls = new Controls(settings, {
 });
 
 // Handy for timing checks from the browser console / tests.
-const debug: { engine: Engine; settings: typeof settings; wall?: unknown } = { engine, settings };
+const debug: { engine: Engine; settings: typeof settings; wall?: unknown; renderChime: unknown; renderHiHat: unknown } = {
+  engine,
+  settings,
+  renderChime,
+  renderHiHat,
+};
 (window as unknown as { __jdm: unknown }).__jdm = debug;
