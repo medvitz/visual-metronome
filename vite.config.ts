@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
-// BASE is set by the deploy workflow (e.g. "/jazz-drummer-metronome/" on GitHub Pages).
+// BASE is set by the deploy workflow (e.g. "/visual-metronome/" on GitHub Pages).
 export default defineConfig({
   base: process.env.BASE ?? "/",
   plugins: [
@@ -9,8 +9,8 @@ export default defineConfig({
       registerType: "autoUpdate",
       includeAssets: ["icons/*.png"],
       manifest: {
-        name: "Jazz Drummer Metronome",
-        short_name: "Jazz Metronome",
+        name: "Visual Metronome",
+        short_name: "Visual Metronome",
         description: "A metronome that lets you see time.",
         theme_color: "#0d0d0f",
         background_color: "#0d0d0f",

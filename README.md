@@ -1,6 +1,6 @@
-# Jazz Drummer Metronome
+# Visual Metronome
 
-A metronome that lets you *see* time, built with Joel.
+A metronome that lets you *see* time, for any musician. Built with Joel.
 
 - **Film-leader countdown circle** counts 1–4. The wedge sweeps once per beat.
 - **Hi-hat "chick" on every beat** by default (2 and 4 only is a setting). Change which beats click in Settings.
